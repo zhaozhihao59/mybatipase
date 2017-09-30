@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="xml"
+            id="mapper"
+            name="MyBatis XML Mapper"
+            priority="normal">
+         <describer
+               class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+            <parameter
+                  name="element" value="mapper/http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+            </parameter>
+         </describer>
+      </content-type>
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="xml"
+            id="config"
+            name="MyBatis XML Config"
+            priority="normal">
+         <describer
+               class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+            <parameter
+                  name="element" value="configuration/http://mybatis.org/dtd/mybatis-3-config.dtd">
+            </parameter>
+         </describer>
+      </content-type>
+      <!-- 'alias-for' does not work as advertised. -->
+      <!-- https://bugs.eclipse.org/bugs/show_bug.cgi?id=85762 -->
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="xml"
+            id="springConfig"
+            alias-for="org.springframework.ide.eclipse.beans.ui.editor.beansConfig"
+            name="MyBatis Spring XML Config"
+            priority="normal">
+         <describer
+               class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+            <parameter
+                  name="element" value="beans">
+            </parameter>
+         </describer>
+      </content-type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="net.harawata.mybatipse.hyperlink.XmlHyperlinkDetector"
+            id="net.harawata.mybatipse.XmlMapperHyperlinkDetector"
+            name="MyBatis XML Mapper Hyperlink Detector"
+            targetId="org.eclipse.core.runtime.xml">
+      </hyperlinkDetector>
+      <hyperlinkDetector
+            activate="true"
+            class="net.harawata.mybatipse.hyperlink.JavaHyperlinkDetector"
+            id="net.harawata.mybatipse.JavaMapperHyperlinkDetector"
+            name="MyBatis Java Mapper Hyperlink Detector"
+            targetId="org.eclipse.jdt.ui.javaCode">
+      </hyperlinkDetector>
+   </extension>
+   <extension
+         id="net.harawata.mybatipse.xml.validator"
+         name="MyBatis XML Mapper Validator"
+         point="org.eclipse.wst.validation.validatorV2">
+      <validator
+            build="true"
+            class="net.harawata.mybatipse.mybatis.XmlValidator"
+            manual="true"
+            markerId="net.harawata.mybatipse.XmlProblem"
+            version="1">
+         <include>
+            <rules>
+               <contentType
+                     id="net.harawata.mybatipse.mapper">
+               </contentType>
+               <contentType
+                     id="net.harawata.mybatipse.config">
+               </contentType></rules>
+         </include>
+      </validator>
+   </extension>
+   <extension
+         point="org.eclipse.wst.sse.ui.completionProposal">
+      <proposalComputer
+            activate="true"
+            categoryId="net.harawata.mybatis.proposalCategory.xml"
+            class="net.harawata.mybatipse.mybatis.XmlCompletionProposalComputer"
+            id="net.harawata.mybatipse.proposalComputer.xml"
+            name="MyBatis XML Mapper Proposal">
+         <contentType
+               id="net.harawata.mybatipse.mapper">
+         </contentType>
+         <contentType
+               id="net.harawata.mybatipse.config">
+         </contentType>
+      </proposalComputer>
+      <proposalCategory
+            id="net.harawata.mybatis.proposalCategory.xml"
+            name="MyBatis XML Proposals">
+      </proposalCategory>
+   </extension>
+   <!--
+   <extension
+         id="net.harawata.mybatipse.XmlSourceValidation"
+         point="org.eclipse.wst.sse.ui.sourcevalidation">
+      <validator
+            class="net.harawata.mybatipse.xml.XmlValidator"
+            id="net.harawata.mybatipse.xml.XmlSourceValidator"
+            scope="total">
+         <contentTypeIdentifier
+               id="org.eclipse.core.runtime.xml">
+         </contentTypeIdentifier>
+         <contentTypeIdentifier
+               id="net.harawata.mybatipse.mapper">
+         </contentTypeIdentifier>
+         <contentTypeIdentifier
+               id="net.harawata.mybatipse.config">
+         </contentTypeIdentifier>
+      </validator>
+   </extension> -->
+   <extension
+         id="net.harawata.mybatipse.XmlProblem"
+         name="MyBatis XML Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+      <attribute
+            name="problemType">
+      </attribute>
+      <attribute
+            name="errorValue">
+      </attribute>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerSeverity="2"
+            markerType="net.harawata.mybatipse.XmlProblem"
+            name="net.harawata.mybatipse.XmlProblemAnnotation"
+            super="org.eclipse.ui.workbench.texteditor.error">
+      </type>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="net.harawata.mybatipse.XmlProblemAnnotation"
+            colorPreferenceKey="net.harawata.mybatipse.XmlProblem.color"
+            colorPreferenceValue="255,192,38"
+            contributesToHeader="true"
+            highlightPreferenceKey="net.harawata.mybatipse.XmlProblem.highlight"
+            highlightPreferenceValue="false"
+            includeOnPreferencePage="true"
+            isGoToNextNavigationTarget="true"
+            isGoToPreviousNavigationTarget="true"
+            label="MyBatis XML Problem"
+            overviewRulerPreferenceKey="net.harawata.mybatipse.XmlProblem.overviewRuler"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="1"
+            symbolicIcon="error"
+            textPreferenceKey="net.harawata.mybatipse.XmlProblem.text"
+            textPreferenceValue="true"
+            textStylePreferenceKey="net.harawata.mybatipse.XmlProblem.textStyle"
+            textStylePreferenceValue="SQUIGGLES"
+            verticalRulerPreferenceKey="net.harawata.mybatipse.XmlProblem.verticalRuler"
+            verticalRulerPreferenceValue="true">
+      </specification>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.harawata.mybatipse.preference.MybatipsePreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.harawata.mybatipse.preference.MybatipsePreferencePage"
+            id="net.harawata.mybatipse.preferencePage"
+            name="MyBatipse">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="net.harawata.mybatipse.preference.MybatipsePreferencePage"
+            id="net.harawata.mybatipse.ProjectSettings"
+            name="MyBatipse">
+         <enabledWhen>
+            <instanceof value="org.eclipse.jdt.core.IJavaProject" />
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         id="MyBatisNature"
+         name="MyBatis Project Nature for Mybatipse"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.harawata.mybatipse.nature.MyBatisNature">
+         </run>
+      </runtime>
+      <requires-nature
+            id="org.eclipse.jdt.core.javanature">
+      </requires-nature>
+      <builder
+            id="net.harawata.mybatipse.MapperValidationBuilder">
+      </builder>
+   </extension>
+   <extension
+         id="MapperValidationBuilder"
+         name="MyBatis Validation"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="net.harawata.mybatipse.nature.MybatipseIncrementalBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+          id="net.harawata.mybatipse.commandCategory"
+          name="MyBatipse">
+      </category>
+      <command
+            defaultHandler="net.harawata.mybatipse.nature.ToggleNatureCommand"
+            id="net.harawata.mybatipse.ToggleNature"
+            name="Add/Remove MyBatis nature">
+         <commandParameter
+               id="net.harawata.mybatipse.ToggleNatureParam"
+               name="On"
+               optional="false">
+         </commandParameter>
+      </command>
+      <command
+            defaultHandler="net.harawata.mybatipse.console.CopyLogStatementHandler"
+            id="net.harawata.mybatipse.CopyLogStatement"
+            name="Copy MyBatis Statement"
+            description="Copy MyBatis statement in the Console View as an executable SQL statement."
+            categoryId="net.harawata.mybatipse.commandCategory">
+      </command>
+      <command
+            defaultHandler="net.harawata.mybatipse.refactoring.handler.XmlElementRenameHandler"
+            id="net.harawata.mybatipse.refactoring.RenameXmlElement"
+            name="Rename MyBatis element"
+            description="Rename MyBatis statement/resultMap ID in XML mapper."
+            categoryId="org.eclipse.ui.category.edit">
+      </command>
+      <command
+            defaultHandler="net.harawata.mybatipse.refactoring.handler.JavaElementRenameHandler"
+            id="net.harawata.mybatipse.refactoring.RenameJavaElement"
+            name="Rename MyBatis element"
+            description="Rename MyBatis statement/resultMap ID in Java mapper."
+            categoryId="org.eclipse.ui.category.edit">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+         <command
+               commandId="net.harawata.mybatipse.ToggleNature"
+               icon="icons/mybatis.png"
+               label="Add MyBatis Nature"
+               style="push">
+            <parameter
+                  name="net.harawata.mybatipse.ToggleNatureParam"
+                  value="true">
+            </parameter>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        ifEmpty="true">
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <not>
+                           <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="net.harawata.mybatipse.MyBatisNature">
+                           </test>
+                        </not>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="net.harawata.mybatipse.ToggleNature"
+               icon="icons/mybatis.png"
+               label="Remove MyBatis Nature"
+               style="push">
+            <parameter
+                  name="net.harawata.mybatipse.ToggleNatureParam"
+                  value="false">
+            </parameter>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        ifEmpty="false">
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                        <test
+                           property="org.eclipse.core.resources.projectNature"
+                           value="net.harawata.mybatipse.MyBatisNature">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.debug.ui.ProcessConsoleType.#ContextMenu?after=additions">
+         <command
+               id="net.harawata.mybatipse.CopyLogStatement"
+               icon="icons/mybatis.png"
+               commandId="net.harawata.mybatipse.CopyLogStatement">
+         </command>
+      </menuContribution>
+      <menuContribution locationURI="popup:refactorPopupMenuId">
+         <command
+               commandId="net.harawata.mybatipse.refactoring.RenameXmlElement"
+               label="Rename MyBatis element">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        ifEmpty="false">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                           property="org.eclipse.core.resources.contentTypeId"
+                           value="net.harawata.mybatipse.mapper" />
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:#CompilationUnitEditorContext?after=org.eclipse.jdt.ui.refactoring.menu">
+         <menu label="MyBatis Refactor">
+            <command
+                  commandId="net.harawata.mybatipse.refactoring.RenameJavaElement"
+                  label="Rename MyBatis element">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="activeEditor">
+                     <test
+                           forcePluginActivation="true"
+                           property="net.harawata.mybatipse.isMyBatisProject" />
+                  </with>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension point="org.eclipse.ui.bindings">
+      <key
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            commandId="net.harawata.mybatipse.CopyLogStatement"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+M2+C">
+      </key>
+      <key
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            commandId="net.harawata.mybatipse.refactoring.RenameXmlElement"
+            contextId="org.eclipse.wst.sse.ui.structuredTextEditorScope"
+            sequence="M1+M2+M3+R">
+      </key>
+      <key
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            commandId="net.harawata.mybatipse.refactoring.RenameJavaElement"
+            contextId="org.eclipse.jdt.ui.javaEditorScope"
+            sequence="M1+M2+M3+R">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.quickAssistProcessors">
+      <quickAssistProcessor
+            class="net.harawata.mybatipse.quickassist.JavaQuickAssistProcessor"
+            id="net.harawata.mybatipse.MapperQuickAssistProcessor"
+            name="net.harawata.mybatipse.MapperQuickAssistProcessor">
+      </quickAssistProcessor>
+   </extension>
+   <extension
+         id="net.harawata.mybatipse.proposalComputer.java"
+         name="MyBatis Proposal"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="net.harawata.mybatipse.javaStringProposalCategory"
+            class="net.harawata.mybatipse.mybatis.JavaCompletionProposalComputer"
+            needsSortingAfterFiltering="false">
+         <partition
+               type="__java_string">
+         </partition>
+      </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         id="javaStringProposalCategory"
+         name="MyBatis Proposals"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <proposalCategory
+            icon="icons/mybatis.png">
+      </proposalCategory>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="net.harawata.mybatipse.ui.viewcategory"
+            class="net.harawata.mybatipse.view.MyBatisSqlView"
+            icon="icons/mybatis.png"
+            id="net.harawata.mybatipseui.mybatissqlview"
+            name="MyBatis Declaration"
+            restorable="true">
+      </view>
+      <category
+            id="net.harawata.mybatipse.ui.viewcategory"
+            name="MyBatis">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.themes">
+      <themeElementCategory
+            id="net.harawata.mybatipse.ui.themeElementCategory"
+            label="mybatipse">
+         <description>
+            Colors and fonts for mybatipse plugin.
+         </description>
+      </themeElementCategory>
+      <colorDefinition
+            categoryId="net.harawata.mybatipse.ui.themeElementCategory"
+            id="net.harawata.mybatipse.ui.mybatissqlviewBackground"
+            isEditable="true"
+            label="MyBatis Declaration view background"
+            value="COLOR_INFO_BACKGROUND">
+         <description>
+            Background color for the MyBatis Declaration view.
+         </description>
+      </colorDefinition>
+      <fontDefinition
+            categoryId="net.harawata.mybatipse.ui.themeElementCategory"
+            defaultsTo="org.eclipse.jface.dialogfont"
+            id="net.harawata.mybatipse.ui.mybatissqlviewFont"
+            isEditable="true"
+            label="MyBatis Declaration view font">
+         <description>
+            Font for the MyBatis Declaration view.
+         </description>
+      </fontDefinition>
+      <colorDefinition
+            categoryId="net.harawata.mybatipse.ui.themeElementCategory"
+            id="net.harawata.mybatipse.ui.mybatissqlviewTextColor"
+            isEditable="true"
+            label="MyBatis Declaration view text color"
+            value="COLOR_INFO_FOREGROUND">
+         <description>
+            Text color for the MyBatis Declaration view.
+         </description>
+      </colorDefinition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="net.harawata.mybatipse.wizard.mybatisCategory"
+            name="MyBatis" />
+      <wizard
+            category="net.harawata.mybatipse.wizard.mybatisCategory"
+            class="net.harawata.mybatipse.wizard.NewXmlMapperWizard"
+            icon="icons/mybatis.png"
+            id="net.harawata.mybatipse.wizard.NewXmlMapperWizard"
+            name="MyBatis XML Mapper" />
+   </extension>
+   <extension
+         point="org.eclipse.jdt.apt.core.annotationProcessorFactory">
+      <java6processors
+            enableDefault="true">
+         <java6processor
+               class="net.harawata.mybatipse.apt.MybatipseAnnotationProcessorFactory">
+         </java6processor>
+      </java6processors>
+   </extension>
+   <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+      <renameParticipant name="MyBatis Java mapper rename participant"
+            class="net.harawata.mybatipse.refactoring.MapperMethodRenameParticipant"
+            id="net.harawata.mybatipse.refactoring.MapperMethodRenameParticipant">
+            <enablement>
+              <with variable="affectedNatures">
+                <iterate operator="or">
+                  <equals value="net.harawata.mybatipse.MyBatisNature"/>
+                </iterate>
+              </with>
+              <with variable="element">
+                <instanceof value="org.eclipse.jdt.core.IMethod"/>
+              </with>
+            </enablement>
+      </renameParticipant>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="net.harawata.mybatipse.refactoring.JavaRefactoringPropertyTester"
+            id="net.harawata.mybatipse.mybatisNaturePropertyTester"
+            namespace="net.harawata.mybatipse"
+            properties="isMyBatisProject"
+            type="org.eclipse.ui.texteditor.ITextEditor">
+      </propertyTester>
+   </extension>
+</plugin>
